@@ -19,6 +19,7 @@
       <nav class="nav">
         <a href="../index.html" class="nav-link">Home</a>
         <a href="../projects.html" class="nav-link">Projects</a>
+        <a href="../blogs.html" class="nav-link">Blogs</a>
         <a href="../resume.html" class="nav-link">Resume</a>
         <a href="../contact.html" class="nav-link">Contact</a>
       </nav>
@@ -33,6 +34,13 @@
         </header>
 
         <div class="article-content">
+          <h2>Currently What I Am Doing</h2>
+          <p>I have had an interest in computers since childhood, and this project is part of that same curiosity spiral that still refuses to end.</p>
+          <p>I realized that to properly understand the C++ memory model, I need a stronger OS background. So right now I am learning from <em>Operating Systems: Three Easy Pieces (OSTEP)</em>, and honestly this book is elite. I started with the goal of learning the concurrency piece, but the first piece on abstractions was so interesting that I got distracted in the best possible way.</p>
+          <p>I am also reading Chapters 5, 6, and 7 from <em>C++ Concurrency in Action</em>. But at this point I can clearly feel that OS foundations make the C++ concurrency ideas much easier to digest.</p>
+          <p>Talking about OS resources: <a href="https://www.youtube.com/@CoreDumpped" target="_blank">Core Dumped</a> is my favorite YouTube channel for learning OS concepts. The visualizations are genuinely awesome.</p>
+          <p>For C++, I watch CppCon videos by Fedor Pikus. Recently I realized I need to lock down fundamentals more carefully, so I have shifted to the CppCon Back to Basics talks for now.</p>
+
           <h2>Motivation</h2>
           <p>I wanted to understand how concurrent data structures guarantee progress and correctness without locks, beyond textbook explanations. The standard library's <code>std::queue</code> is fundamentally unsuited for concurrent access—it provides no atomicity guarantees and breaks under contention.</p>
           <p>High-frequency trading systems and message-passing architectures rely heavily on lock-free queues. I chose to implement one from scratch to understand the actual constraints: memory ordering, progress guarantees, and the tradeoffs between throughput and correctness.</p>

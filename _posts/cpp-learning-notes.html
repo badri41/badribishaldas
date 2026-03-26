@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C++ Learning Notes | Badri Bishal Das</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+    <span class="theme-icon"></span>
+  </button>
+
+  <div class="container">
+    <header class="site-header">
+      <nav class="nav">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="../projects.html" class="nav-link">Projects</a>
+        <a href="../blogs.html" class="nav-link active">Blogs</a>
+        <a href="../resume.html" class="nav-link">Resume</a>
+        <a href="../contact.html" class="nav-link">Contact</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <article class="article">
+        <header class="article-header">
+          <a href="../blogs.html" class="back-link">&larr; Blogs</a>
+          <h1>C++: My Long-Term Relationship with Compile Errors</h1>
+          <p class="article-meta">C++ / Systems / Concurrency <span class="status">New</span></p>
+        </header>
+
+        <div class="article-content">
+          <h2>Why this blog exists</h2>
+          <p>C++ is the only language that can make you feel like a genius at 2:00 PM and emotionally unemployed by 2:07 PM. I love it anyway.</p>
+          <p>I am learning C++ in the most honest way possible: by writing code, getting humbled, watching talks, and then pretending I always knew that <code>undefined behavior</code> was the issue.</p>
+
+          <h2>What I am learning from</h2>
+          <p>These are the resources I actively use. This list is a mix of fundamentals, architecture-aware performance, modern language features, and concurrency:</p>
+          <ul>
+            <li><a href="https://www.youtube.com/playlist?list=PLs3KjaCtOwSY34fFKyhOFovFlB7LikDwe" target="_blank">CppCon Back to Basics playlist</a></li>
+            <li><a href="https://www.youtube.com/@cppcon" target="_blank">CppCon videos</a>, including Fedor Pikus talks</li>
+            <li><a href="https://www.youtube.com/@TheCherno" target="_blank">The Cherno</a></li>
+            <li><a href="https://www.youtube.com/@JasonTurner" target="_blank">C++ Weekly by Jason Turner</a> and <a href="https://www.youtube.com/watch?v=QyJzVx7vD2I" target="_blank">Ep 441: Multiple Dispatch</a></li>
+            <li><a href="https://www.youtube.com/@MikeShah" target="_blank">Mike Shah</a></li>
+            <li><a href="https://www.youtube.com/@NotesByNick" target="_blank">NotesByNick</a></li>
+          </ul>
+
+          <h2>Talks currently in my loop</h2>
+          <ul>
+            <li>Back to Basics: Virtual Dispatch and its Alternatives - Inbal Levi - CppCon 2019</li>
+            <li>An (In-) Complete Guide to C++ Object Lifetimes - Jonathan Muller - Meeting C++ 2024</li>
+            <li>Mastering Memory Allocation - Part I - Memory Layouts of a C program</li>
+            <li>code::dive conference 2014 - Scott Meyers: CPU Caches and Why You Care</li>
+            <li>Threads vs Coroutines - Why C++ Has Two Concurrency Models - Conor Spilsbury - CppCon 2025</li>
+            <li>CppCon 2017: Fedor Pikus - C++ atomics, from basic to advanced</li>
+            <li>CppCon 2016: Timur Doumler - Want fast C++? Know your hardware!</li>
+            <li>Deciphering C++ Coroutines (2022) and Part 2 (2024) - Andreas Weis</li>
+            <li>Back to Basics: Unit Testing in C++ - Dave Steffen - CppCon 2024</li>
+            <li>Three Cool Things in C++26: Safety, Reflection &amp; std::execution - Herb Sutter - C++ on Sea 2025</li>
+            <li>CppCon 2014: Herb Sutter - Lock-Free Programming, Part I</li>
+            <li>CppCon 2015: Richard Powell - Intro to the C++ Object Model</li>
+            <li>Back to Basics: Object-Oriented Programming - Jon Kalb - CppCon 2019</li>
+            <li>Back to Basics: C++ Concurrency - David Olsen - CppCon 2023</li>
+            <li>CppCon 2016: Gor Nishanov - C++ Coroutines: Under the covers</li>
+            <li>The worst programming language of all time</li>
+          </ul>
+
+          <h2>Books on desk, tabs in browser, and mild chaos</h2>
+          <ul>
+            <li>Effective Modern C++ - Scott Meyers</li>
+            <li>Beautiful C++</li>
+            <li>C++20 Software Design - Klaus Iglberger</li>
+            <li>C++ Templates: The Complete Guide</li>
+            <li>Practical C++14 Metaprogramming</li>
+            <li>The C++11 Programming Language - Bjarne Stroustrup</li>
+            <li>C++ Concurrency in Action - Anthony Williams</li>
+            <li>Optimized C++ - Kurt Guntheroth</li>
+            <li>C++ Primer (2005) - Lippman</li>
+            <li>C++ Notes for Professionals</li>
+          </ul>
+
+          <h2>What this means in practice</h2>
+          <p>I am trying to balance cool advanced topics with proper basics. So yes, I watch atomics and coroutine talks, then immediately return to Back to Basics like a responsible adult who has been humbled by one race condition.</p>
+
+          <h2>Current state</h2>
+          <p>I used to think templates were scary. Now I think templates are normal, and linker errors are scary. This is growth.</p>
+          <p>Goal for the next few weeks: build stronger basics, write cleaner concurrent code, and make peace with the fact that C++ is both a language and a lifestyle.</p>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>Badri Bishal Das</p>
+    </footer>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+  </script>
+</body>
+</html>

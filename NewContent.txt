@@ -1,0 +1,21 @@
+So I have, had interest in computers since, Childhood. 
+
+-- Add this Under threadsafe-queue.html
+{PROMPT :: REMOVE THE DBMS FROM SCRATCH FROM MY WEBSITE}
+Currently What am I doing... 
+
+i realized that to understand the C++ Memory Model, I need to have a good background in OS topics, 
+so right now I am learning those from the Operating Systems : Three Easy Pieces Book and Honestly this book 
+is the best book for OS. I wanted to learn the Concurrency Piece, but the First Piece : Abstractions was so interesting 
+that I have become distracted from Concurrency. I am also reading the Ch 5, 6, & 7 from the C++ Concurrency in Action
+Book, but Honestly I feel I need background of Operating Systems to understand the book in clarity.. 
+
+Btw, Talking about OS, CoreDumped is my favourite YouTube Channel to learn Operating System Concepts. The Visualizations
+are awesome. 
+
+I watch CPPCon videos by Fedor Pikus, but right now I felt that I need to hold the basics properly.. :( ...
+
+
+So I am now watching CPPCon Back to Basics videos... :) .. 
+
+yeah so talking about OS, 
