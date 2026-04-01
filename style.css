@@ -198,10 +198,11 @@ body.dark .theme-icon::before {
 }
 
 .container {
-  max-width: 700px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
   min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -238,7 +239,7 @@ body.dark .theme-icon::before {
 .main {
   flex: 1;
   padding: 0 48px 64px;
-  max-width: 700px;
+  max-width: 1000px;
 }
 
 .main-centered {
@@ -445,7 +446,7 @@ body.dark .theme-icon::before {
 
 /* Article / Blog Post */
 .article {
-  max-width: 700px;
+  max-width: 1000px;
 }
 
 .article-header {

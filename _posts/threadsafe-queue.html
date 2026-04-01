@@ -34,78 +34,80 @@
         </header>
 
         <div class="article-content">
+          <h3>
+            Github Link : 
+            <a href="https://github.com/badri41/ThreadSafeQueueLib">
+              ThreadSafeQueueLib
+            </a>
+          </h3>
           <h2>Currently What I Am Doing</h2>
-          <p>I have had an interest in computers since childhood, and this project is part of that same curiosity spiral that still refuses to end.</p>
           <p>I realized that to properly understand the C++ memory model, I need a stronger OS background. So right now I am learning from <em>Operating Systems: Three Easy Pieces (OSTEP)</em>, and honestly this book is elite. I started with the goal of learning the concurrency piece, but the first piece on abstractions was so interesting that I got distracted in the best possible way.</p>
           <p>I am also reading Chapters 5, 6, and 7 from <em>C++ Concurrency in Action</em>. But at this point I can clearly feel that OS foundations make the C++ concurrency ideas much easier to digest.</p>
-          <p>Talking about OS resources: <a href="https://www.youtube.com/@CoreDumpped" target="_blank">Core Dumped</a> is my favorite YouTube channel for learning OS concepts. The visualizations are genuinely awesome.</p>
-          <p>For C++, I watch CppCon videos by Fedor Pikus. Recently I realized I need to lock down fundamentals more carefully, so I have shifted to the CppCon Back to Basics talks for now.</p>
-
+          
           <h2>Motivation</h2>
+          <p>I am building this project under the guidance and mentorship of Toshit Jain Bhaiya. He and his brother Tushar are pretty cracked in C++.</p>
           <p>I wanted to understand how concurrent data structures guarantee progress and correctness without locks, beyond textbook explanations. The standard library's <code>std::queue</code> is fundamentally unsuited for concurrent access—it provides no atomicity guarantees and breaks under contention.</p>
           <p>High-frequency trading systems and message-passing architectures rely heavily on lock-free queues. I chose to implement one from scratch to understand the actual constraints: memory ordering, progress guarantees, and the tradeoffs between throughput and correctness.</p>
 
           <h2>Problem Definition</h2>
-          <p>Design and implement a family of thread-safe queues in C++ that support multiple producers and multiple consumers (MPMC) operating concurrently on a shared structure, while:</p>
+          <p>Design and implement a family of thread-safe queues in C++ that support various modes (SPSC, MPSC, MPMC) and configurations (bounded vs unbounded, blocking vs non-blocking):</p>
           <ul>
             <li>Avoiding data races and undefined behavior</li>
             <li>Providing progress guarantees (lock-free or wait-free)</li>
             <li>Supporting both bounded (fixed-capacity ring buffer) and unbounded modes</li>
             <li>Maintaining reasonable throughput under contention</li>
           </ul>
-          <p>The difficulty lies in the interaction between interface design and concurrency. A standard queue's <code>empty()</code> check followed by <code>front()</code> is inherently racy—another thread can <code>pop()</code> between the two calls. This forces a fundamentally different API design.</p>
+          <p>The difficulty lies in the interaction between interface design and concurrency. A standard queue's <code>empty()</code> check followed by 
+            <code>front()</code> is inherently prone to data races, another thread can <code>pop()</code> between the two calls. This forces a fundamentally different API design.</p>
 
           <h2>Design Decisions</h2>
 
-          <h3>Why lock-free instead of mutex-based?</h3>
-          <p>Mutex-based queues are easier to implement and reason about. However, they suffer from priority inversion, context-switch overhead, and poor scalability under contention. In latency-sensitive systems, a thread holding a lock can block all other threads indefinitely.</p>
+          <h3>Why lock-free?</h3>
+          <p>Mutex-based Locking queues are easier to implement and reason about. However, they suffer from priority inversion, context-switch overhead,
+             and poor scalability under contention. 
+            In latency-sensitive systems, a thread holding a lock can block all other threads indefinitely.</p>
           <p>Lock-free structures provide a progress guarantee: at least one thread will make progress in a finite number of steps, even if other threads are delayed or preempted. This matters in real-time and high-throughput scenarios.</p>
-          <p>I chose lock-free over wait-free because wait-free algorithms (where every thread completes in bounded steps) are significantly more complex and often slower in practice due to helping mechanisms.</p>
-
-          <h3>Why MPMC?</h3>
-          <p>SPSC (single-producer, single-consumer) queues allow aggressive optimizations—no atomic operations on indices, cache-friendly memory access patterns. But they're limited to specific use cases.</p>
-          <p>MPMC is the general case. Supporting multiple producers and consumers makes the library applicable to thread pools, work-stealing schedulers, and event-driven architectures. The implementation complexity is higher, but the utility is broader.</p>
 
           <h3>Bounded vs unbounded</h3>
           <p>Bounded queues use a fixed-size ring buffer. Memory is pre-allocated, index arithmetic is fast (modulo operations), and memory usage is predictable. The tradeoff is that producers must handle the full case—either block, spin, or return failure.</p>
           <p>Unbounded queues grow dynamically, typically using a linked list of nodes. This avoids the full-queue problem but introduces allocation overhead and potential memory fragmentation.</p>
-          <p>I implemented bounded first because it exposes the core concurrency challenges without conflating them with memory management concerns.</p>
 
           <h3>Template metaprogramming for compile-time configuration</h3>
-          <p>Rather than runtime polymorphism with virtual functions, I used template parameters to select queue characteristics (SPSC/MPSC/MPMC, bounded/unbounded, blocking/non-blocking). This allows the compiler to generate specialized code for each configuration, eliminating branches and enabling aggressive inlining.</p>
+          <p>Rather than runtime polymorphism with virtual functions, I used template parameters to select queue characteristics (SPSC/MPSC/MPMC, bounded/unbounded, blocking/non-blocking). This allows the compiler to generate specialized code for each configuration, eliminating branches and enabling aggressive inlining during Compile Time itself.</p>
 
           <h2>Core Technical Challenges</h2>
 
           <h3>The ABA problem</h3>
           <p>In lock-free structures using compare-and-swap (CAS), a thread may read value A, get preempted, and another thread may change the value to B and back to A. The first thread's CAS succeeds even though the data structure has changed.</p>
-          <p>In queues, ABA can cause a node to be recycled and reused while another thread still holds a pointer to it. I addressed this by using tagged pointers—packing a version counter into unused bits of the pointer. Each modification increments the counter, so A with counter 1 is distinguishable from A with counter 2.</p>
+          <p>In queues, ABA can cause a node to be recycled and reused while another thread still holds a pointer to it.</p>
 
           <h3>Memory ordering choices</h3>
-          <p>C++ provides six memory orderings, from <code>relaxed</code> (no synchronization) to <code>seq_cst</code> (full sequential consistency). Using <code>seq_cst</code> everywhere is safe but slow—it inserts memory barriers that prevent hardware reordering optimizations.</p>
+          <p>C++ provides many memory orderings, from <code>relaxed</code> (no synchronization) to <code>seq_cst</code> (full sequential consistency). Using <code>seq_cst</code> everywhere is safe but slow. it inserts memory barriers that prevent hardware reordering optimizations.
+          Basically your Compiler and CPU can change the order of operations, as long as it doesn't interfere with the program's logical execution.</p>
           <p>I analyzed each atomic operation to determine the minimum ordering required. Producer writes to the buffer need release semantics; consumer reads need acquire semantics. Index updates can often use relaxed ordering when combined with acquire-release on the data itself.</p>
-          <p>Getting this wrong initially caused subtle bugs that only manifested under specific thread interleavings on ARM (which has a weaker memory model than x86).</p>
+          <p>Getting this wrong is dangerous, My system uses ARM which has a weaker memory model that the TSO (Total Store Ordering) of x86.</p>
 
           <h3>False sharing</h3>
           <p>When producer and consumer indices share a cache line, writing to one invalidates the other thread's cache, even though they're accessing different variables. This thrashing destroys performance.</p>
-          <p>I aligned indices to separate cache lines using <code>alignas(64)</code>. This simple change improved throughput by 3-4x in my benchmarks.</p>
+          <p>Do understand what is really Happening, I had to learn the Cache Protocols specifically the MESI protocol (Modified, Exclusive, Shared, Invalid).</p>
+          <p>I aligned indices to separate cache lines using <code>alignas(HARDWARE_CACHE_LINE_SIZE)</code>. This simple change improved throughput by ~6x in my benchmarks.</p>
 
           <h3>Debugging concurrency issues</h3>
           <p>Concurrency bugs are non-deterministic. A test might pass 10,000 times and fail once. I used ThreadSanitizer extensively during development—it instruments memory accesses and reports data races. I also wrote stress tests that spawn many threads and run millions of operations, checking invariants after each run.</p>
-          <p>One bug took two days to find: a relaxed load on an index was being reordered past an acquire fence, causing a consumer to read uninitialized data. The fix was a single word change (<code>memory_order_acquire</code>), but finding it required careful reasoning about the happens-before relationship.</p>
+          <p>Its not trivial to prove the correctness of your code and that it will not suffer a data race. Various Flags must be used to handle this.</p>
 
           <h2>Results & Evaluation</h2>
-          <p>On a 4-core machine with 4 producer and 4 consumer threads:</p>
+          <!-- <p>On a 4-core machine with 4 producer and 4 consumer threads:</p>
           <ul>
             <li>Throughput: ~15M operations/second for the bounded MPMC queue</li>
             <li>Latency (median): ~200ns per enqueue/dequeue pair</li>
             <li>Latency (99th percentile): ~2μs under contention</li>
           </ul>
           <p>The lock-free implementation outperforms a mutex-based version by 2-5x under contention, with the gap widening as thread count increases.</p>
-          <p>Limitations remain. Tail latency is sensitive to the memory reclamation strategy—currently using epoch-based reclamation, which can delay cleanup during long-running operations. Under extreme contention (many more threads than cores), lock-free structures can actually perform worse than well-tuned mutexes due to CAS retry overhead.</p>
-
+          <p>Limitations remain. Tail latency is sensitive to the memory reclamation strategy—currently using epoch-based reclamation, which can delay cleanup during long-running operations. Under extreme contention (many more threads than cores), lock-free structures can actually perform worse than well-tuned mutexes due to CAS retry overhead.</p> -->
+          <p>WILL ADD THIS LATER</p>
           <h2>What I Learned</h2>
-          <p>The gap between understanding lock-free algorithms in theory and implementing them correctly is substantial. The C++ memory model is precise but subtle—relaxed atomics behave differently across architectures, and compiler reorderings are unpredictable without explicit barriers.</p>
-          <p>If I were to redo this project, I would start with formal verification tools (like CDSChecker or GenMC) earlier in the development process, rather than relying primarily on stress testing. I would also implement hazard pointers as an alternative to epoch-based reclamation to compare their tradeoffs directly.</p>
+          <p>WILL ADD After I learn...</p>
         </div>
 
         <footer class="article-footer">
