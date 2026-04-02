@@ -3,132 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
   <title>Badri Bishal Das</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="Badri Bishal Das is a DSAI undergraduate at IIT Guwahati writing about C++, systems, computer architecture, and performance-oriented software projects.">
+  <link rel="canonical" href="https://www.badribishaldas.in/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Badri Bishal Das">
+  <meta property="og:description" content="insert website description here">
+  <meta property="og:url" content="https://www.badribishaldas.in/">
+  <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-    <span class="theme-icon"></span>
-  </button>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="home"></site-sidebar>
 
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="sidebar-content">
-        <div class="photo-container">
-          <img src="assets/images/photo.jpg" alt="Badri Bishal Das" class="photo">
-        </div>
-        <h1 class="sidebar-name">Badri Bishal Das</h1>
-        <p class="sidebar-tagline">DSAI Undergrad @ IIT Guwahati</p>
-        <p class="sidebar-highlight">Incoming ASDI Intern @ Google</p>
+    <main class="page-content">
+      <mobile-nav page="home"></mobile-nav>
 
-        <div class="sidebar-icons">
-          <a href="https://codeforces.com/profile/badri41" target="_blank" title="Codeforces">
-            <img src="assets/images/codeforces.png" alt="Codeforces">
-          </a>
-          <a href="https://www.codechef.com/users/badri41" target="_blank" title="CodeChef">
-            <img src="assets/images/codechef.png" alt="CodeChef">
-          </a>
-          <a href="https://atcoder.jp/users/badri41" target="_blank" title="AtCoder">
-            <img src="assets/images/atcoder.png" alt="AtCoder">
-          </a>
-        </div>
-
-        <nav class="sidebar-links">
-          <a href="https://github.com/badri41" target="_blank">
-            <img src="assets/images/github.png" alt="GitHub"> GitHub
-          </a>
-          <a href="https://www.linkedin.com/in/badribishaldas/" target="_blank">
-            <img src="assets/images/linkedin.png" alt="LinkedIn"> LinkedIn
-          </a>
-          <a href="mailto:d.badri@iitg.ac.in">
-            <img src="assets/images/email.png" alt="Email"> Email
-          </a>
-          <a href="https://drive.google.com/file/d/1rK-iioi5mBZ_UGJb5s8rR_fZhgtDjMIJ/view?usp=sharing" target="_blank">
-            <img src="assets/images/resume.png" alt="Resume"> Resume
-          </a>
-        </nav>
-      </div>
-    </aside>
-
-    <div class="main-wrapper">
-      <header class="site-header">
-        <nav class="nav">
-          <a href="index.html" class="nav-link active">Home</a>
-          <a href="projects.html" class="nav-link">Projects</a>
-          <a href="blogs.html" class="nav-link">Blogs</a>
-          <a href="resume.html" class="nav-link">Resume</a>
-          <a href="contact.html" class="nav-link">Contact</a>
-        </nav>
+      <header class="page-intro">
+        <h1 class="page-title">Greetings fellow stranger</h1>
+        <br>
+        <p class="page-summary">
+          I am Badri Bishal Das, a Data Science and Artificial Intelligence undergraduate at IIT Guwahati.
+          My interests lie in C++ development, computer architecture, operating systems, and performance-critical systems programming.
+        </p>
       </header>
 
-      <main class="main main-centered">
-        <section class="currently-working">
-          <h2>Currently Working On</h2>
-          <ul class="working-list">
-            <li><a href="_posts/threadsafe-queue.html">ThreadSafeQueueLib</a> — Lock-free MPMC queue in C++</li>
-            <li><a href="_posts/CPP-Part1.html">C++ Part 1: </a> The Beginning of the End</li>
-          </ul>
-        </section>
-
-        <section class="about">
-        <h2>About</h2>
-        <p>Hi! I am Badri Bishal Das, a Data Science and Artificial Intelligence undergrad at the Indian Institute of Technology Guwahati. My interests lie in C++ development, computer architecture, operating systems, and performance-critical systems programming. I am open to opportunities for Winter 2026 & Summer 2027. Feel free to reach out through the emails listed.</p>
-
-        <h3>Technical Interests</h3>
-
-        <p>
-        <strong>C++ & Systems Programming:</strong> My relationship with C++ is love–hate. Honestly, there is no standard way to learn this language — the deeper you go, the more of a rabbit hole it becomes. One moment you feel cracked, the next moment the compiler reminds you that undefined behavior exists. The language sometimes feels like carefully engineered ragebait, full of quirks, edge cases, and mysterious template errors that span multiple screens. Follow my C++ blog if you enjoy exploring this chaos with me.
-        </p>
-
-        <p>
-        <strong>Computer Architecture:</strong> I like learning how computers actually work under the hood — caches, memory hierarchy, branch prediction, and all the clever tricks CPUs use to make your code look faster than it deserves to be. I enjoy it from the “how software runs on hardware” side. Once it turns into drawing circuits and designing hardware blocks, however, my brain quietly logs out of the session. Follow the Computer Architecture & OS blog for posts and resources on these topics.
-        </p>
-
-        <p>
-        <strong>Operating Systems:</strong> Learning operating systems is both fun and oddly satisfying. Concepts like processes, threads, scheduling, virtual memory, and paging make you appreciate just how much the OS abstracts away the internals. I enjoy exploring how operating systems manage hardware resources and provide abstractions that make modern computing possible. Follow the Computer Architecture & OS blog for posts and resources related to OS internals.
-        </p>
-
-        <p>
-        <strong>Competitive Programming:</strong> I like CP because it is both fun and deeply humbling. Some days I solve problems and feel like I understand algorithms. Other days a single problem makes me question my entire existence and every life choice that led me there. I currently aspire to perform well in ICPC.
-        </p>
-
-        <p>
-        <strong>Probability & Quantitative Puzzles:</strong> I enjoy solving mathematically driven problems involving probability, combinatorics, and statistical reasoning.
-        </p>
-
-        <h3>Non-Technical Interests</h3>
-        <p>Outside academics, I try to stay physically active. I regularly play badminton, go running, and follow fitness as a way to stay disciplined (and to counter the effects of staring at a screen all day). I also enjoy travelling and trekking whenever I get the chance.</p>
+      <section class="content-block">
+        <h2 class="section-title">Currently Working On</h2>
+        <ul class="working-list">
+          <li><strong><a href="/blog/threadSafeQueue/">ThreadSafeQueueLib:</a></strong> A Concurrent Queue Library in C++</li>
+          <li><strong><a href="/blog/cpp-part1/">C++ Episode 1:</a></strong> There is no going back now </li>
+        </ul>
       </section>
-        <section class="blogs">
-          <h2>Blogs</h2>
-          <ul class="blog-list">
-            <li><a href="_posts/threadsafe-queue.html">ThreadSafeQueueLib: Lock-Free MPMC Queue in C++</a> <span class="status">In Progress</span></li>
-            <li><a href="_posts/CPP-Part1.html">C++ Part 1: My fairly Short Journey with the Language</a> <span class="status">New</span></li>
-            <li><a href="_posts/architecture-os-notes.html">Computer Architecture & OS: Where My Brain Meets the Memory Wall</a> <span class="status">New</span></li>
-          </ul>
-        </section>
-      </main>
 
-      <footer class="site-footer">
-        <p>Badri Bishal Das</p>
-      </footer>
-    </div>
+      <section class="content-block">
+        <h2 class="section-title">Incoming Blogs</h2>
+        <ol class="incoming-list">
+          <li>
+            <strong>My Experience as a Summer Intern in Google Ananta</strong>
+            <span class="incoming-tags">
+              <span class="incoming-tag">Internship</span>
+            </span>
+          </li>
+        </ol>
+      </section>
+
+      <section class="content-block" id="about">
+        <h2 class="section-title">About</h2>
+        <div class="about-copy">
+          <p>
+            Hi. I am Badri Bishal Das, a Data Science and Artificial Intelligence undergrad at the Indian Institute of Technology Guwahati.
+            I am open to opportunities for Winter 2026 and Summer 2027. Feel free to reach out through the contact links.
+          </p>
+          <p>
+            Aside from Techical interests, I like playing badminton, watching anime, Trekking, and playing various games.
+          </p>
+        </div>
+      </section>
+
+      <section class="content-block">
+        <h2 class="section-title">Technical Interests</h2>
+        <div class="interest-list">
+          <div class="interest-copy">
+            <strong>C++ &amp; Systems Programming</strong>
+            <p>
+              I like C++ because it gives me power, but sometimes it also gives me a big headache >_<. Its so vast, the more I learn it, the less I feel I know.
+            </p>
+          </div>
+
+          <div class="interest-copy">
+            <strong>Computer Architecture</strong>
+            <p>
+              I liked computers since I was a child.
+              I enjoy it from the software runs on hardware side tho. Once it turns into drawing circuits and designing hardware blocks, my brain quietly logs out of the session (Sorry Electrical Engineers :P).
+            </p>
+          </div>
+
+          <div class="interest-copy">
+            <strong>Operating Systems</strong>
+            <p>
+              Learning operating systems is both fun and oddly satisfying. Processes, threads, scheduling, virtual memory, and paging make you appreciate how much the OS abstracts away.
+            </p>
+          </div>
+
+          <div class="interest-copy">
+            <strong>Competitive Programming</strong>
+            <p>
+              CP is fun. The instant feedback, the ups and downs is where the fun is. 
+            </p>
+          </div>
+
+          <div class="interest-copy">
+            <strong>Probability &amp; Quantitative Puzzles</strong>
+            <p>
+              Solving Probability, Combiatorics and Expected value puzzles is always a delight.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
-
-  <script>
-    function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle('dark');
-      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-    }
-
-    // Load saved theme
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark');
-    }
-  </script>
 </body>
 </html>

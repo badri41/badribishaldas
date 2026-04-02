@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>Systems | Badri Bishal Das</title>
+  <meta name="description" content="Systems posts by Badri Bishal Das.">
+  <link rel="canonical" href="https://www.badribishaldas.in/category/systems/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+      <header class="page-intro">
+        <h1 class="page-title">Systems</h1>
+        <p class="page-summary">Posts on operating systems, architecture, and the hardware-aware background behind the C++ work.</p>
+      </header>
+      <ul class="category-links">
+        <li><a href="/blogs/">All Posts</a></li>
+        <li><a href="/category/cpp/">C++</a></li>
+        <li><a class="active" href="/category/systems/">Systems</a></li>
+        <li><a href="/category/misc/">Misc</a></li>
+      </ul>
+      <div class="blog-list">
+        <blog-card
+          date="APR 01, 2026"
+          category="SYSTEMS"
+          category-href="/category/systems/"
+          href="/blog/OS/"
+          title="Computer Architecture &amp; OS: Where My Brain Meets the Memory Wall"
+          description="A compact reading list for operating systems, architecture, memory hierarchy, and the background that makes concurrency make more sense."></blog-card>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

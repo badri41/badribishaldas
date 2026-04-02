@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>CNN from Scratch | Badri Bishal Das</title>
+  <meta name="description" content="A case study on building a convolutional neural network from scratch using only NumPy.">
+  <link rel="canonical" href="https://www.badribishaldas.in/blog/CNNfromScratch/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="CNN from Scratch | Badri Bishal Das">
+  <meta property="og:description" content="A project case study on implementing a CNN with only NumPy and manual backpropagation.">
+  <meta property="og:url" content="https://www.badribishaldas.in/blog/CNNfromScratch/">
+  <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+
+      <a class="back-link" href="/blogs/">All Posts</a>
+
+      <header class="post-header">
+        <div class="post-meta">
+          <span class="post-date">MAR 29, 2026</span>
+          <a class="post-category" href="/category/misc/">MISC</a>
+        </div>
+        <h1 class="post-title">CNN from Scratch</h1>
+        <p class="post-summary">
+          A case study on building a convolutional neural network with only NumPy, including manual convolution, backpropagation, and enough debugging to make the abstractions feel earned.
+        </p>
+      </header>
+
+      <section class="content-block">
+        <h2 class="section-title">Table of Contents</h2>
+        <nav class="toc" data-toc-target=".post-body"></nav>
+      </section>
+
+      <article class="post-body">
+        <h2>Overview</h2>
+        <p>
+          This project was about understanding the full pipeline instead of leaning on a framework to hide the machinery.
+          I implemented convolution, ReLU, max pooling, flattening, dense layers, softmax, and backpropagation directly in Python and NumPy.
+        </p>
+
+        <h2>Why It Was Worth Doing</h2>
+        <p>
+          Modern frameworks are great for shipping models faster, but they also make it easy to skip the details that explain why the model works at all.
+          Implementing the pieces manually forced careful thinking about dimensions, gradients, numerical stability, and where performance actually gets lost.
+        </p>
+
+        <h2>What I Built</h2>
+        <ul>
+          <li>Convolution layers with forward and backward passes.</li>
+          <li>ReLU and max pooling.</li>
+          <li>Dense layers, softmax, and cross-entropy loss.</li>
+          <li>Training logic for MNIST.</li>
+        </ul>
+
+        <h2>What I Learned</h2>
+        <p>
+          The hardest part was not writing matrix operations. It was debugging gradients and keeping the bookkeeping clean.
+          The project also reinforced something I like about implementation-first work in general: once you build the details yourself, the abstraction stops feeling magical.
+        </p>
+      </article>
+
+      <nav class="post-pagination">
+        <a href="/blog/OS/">Prev: Computer Architecture &amp; OS</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>

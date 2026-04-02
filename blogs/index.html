@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>Blogs | Badri Bishal Das</title>
+  <meta name="description" content="Technical writing by Badri Bishal Das on C++, systems, and implementation-focused projects.">
+  <link rel="canonical" href="https://www.badribishaldas.in/blogs/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Blogs | Badri Bishal Das">
+  <meta property="og:description" content="Minimal technical blog grouped by category.">
+  <meta property="og:url" content="https://www.badribishaldas.in/blogs/">
+  <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+
+      <header class="page-intro">
+        <h1 class="page-title">Blogs</h1>
+      </header>
+
+      <ul class="category-links">
+        <li><a class="active" href="/blogs/">All Posts</a></li>
+        <li><a href="/category/cpp/">C++</a></li>
+        <li><a href="/category/systems/">Systems</a></li>
+        <li><a href="/category/misc/">Misc</a></li>
+      </ul>
+
+      <section class="content-block">
+        <h2 class="section-title">Incoming Blogs</h2>
+        <ol class="incoming-list">
+          <li>
+            <strong>My Experience as a Summer Intern in Google Ananta</strong>
+            <span class="incoming-tags">
+              <span class="incoming-tag">Internship</span>
+              <span class="incoming-tag">Google</span>
+            </span>
+          </li>
+        </ol>
+      </section>
+
+      <section class="blog-group">
+        <h2 class="blog-group-title">C++</h2>
+        <div class="blog-list">
+          <blog-card
+            date="APR 02, 2026"
+            category="C++"
+            category-href="/category/cpp/"
+            href="/blog/cpp-part1/"
+            title="C++ Episode 1: There is no going back now"
+            description="Notes on resources, books, and what currently feels worth understanding properly."></blog-card>
+
+          <blog-card
+            date="APR 02, 2026"
+            category="C++"
+            category-href="/category/cpp/"
+            href="/blog/threadSafeQueue/"
+            title="ThreadSafeQueueLib: A Concurrent Queue Library in C++"
+            description="That time I got reincarnated as a lock-free queue library implementer."></blog-card>
+        </div>
+      </section>
+
+      <section class="blog-group">
+        <h2 class="blog-group-title">Systems</h2>
+        <div class="blog-list">
+          <blog-card
+            date="APR 01, 2026"
+            category="SYSTEMS"
+            category-href="/category/systems/"
+            href="/blog/OS/"
+            title="Computer Architecture &amp; OS: A Reading List"
+            description="A compact reading list for operating systems, architecture, and memory hierarchy."></blog-card>
+        </div>
+      </section>
+
+      <section class="blog-group">
+        <h2 class="blog-group-title">Misc</h2>
+        <div class="blog-list">
+          <blog-card
+            date="MAR 29, 2026"
+            category="MISC"
+            category-href="/category/misc/"
+            href="/blog/CNNfromScratch/"
+            title="CNN from Scratch"
+            description="Building a convolutional neural network from Scratch using only NumPy."></blog-card>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

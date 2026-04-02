@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>C++ | Badri Bishal Das</title>
+  <meta name="description" content="C++ posts by Badri Bishal Das.">
+  <link rel="canonical" href="https://www.badribishaldas.in/category/cpp/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+      <header class="page-intro">
+        <h1 class="page-title">C++</h1>
+        <p class="page-summary">Posts on C++, systems programming, and the chaos that comes with learning the language properly.</p>
+      </header>
+      <ul class="category-links">
+        <li><a href="/blogs/">All Posts</a></li>
+        <li><a class="active" href="/category/cpp/">C++</a></li>
+        <li><a href="/category/systems/">Systems</a></li>
+        <li><a href="/category/misc/">Misc</a></li>
+      </ul>
+      <div class="blog-list">
+        <blog-card
+          date="APR 02, 2026"
+          category="C++"
+          category-href="/category/cpp/"
+          href="/blog/cpp-part1/"
+          title="C++ Part 1: The Beginning of the End"
+          description="That time I got reincarnated as a C++ dev. Notes on resources, books, and what currently feels worth understanding properly."></blog-card>
+        <blog-card
+          date="APR 02, 2026"
+          category="C++"
+          category-href="/category/cpp/"
+          href="/blog/threadSafeQueue/"
+          title="ThreadSafeQueueLib: Lock-Free MPMC Queue in C++"
+          description="That time I got reincarnated as a lock-free queue library implementer. A project log on memory ordering, false sharing, and queue design under contention."></blog-card>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

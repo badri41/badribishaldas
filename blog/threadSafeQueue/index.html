@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>ThreadSafeQueueLib: Lock-Free MPMC Queue in C++ | Badri Bishal Das</title>
+  <meta name="description" content="A project write-up on building a lock-free MPMC queue in C++, including memory ordering, false sharing, debugging, and systems background.">
+  <link rel="canonical" href="https://www.badribishaldas.in/blog/threadSafeQueue/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="ThreadSafeQueueLib: Lock-Free MPMC Queue in C++ | Badri Bishal Das">
+  <meta property="og:description" content="A project log on lock-free queue design, memory ordering, and the systems knowledge needed to reason about it properly.">
+  <meta property="og:url" content="https://www.badribishaldas.in/blog/threadSafeQueue/">
+  <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+
+      <a class="back-link" href="/blogs/">All Posts</a>
+
+      <header class="post-header">
+        <div class="post-meta">
+          <span class="post-date">APR 02, 2026</span>
+          <a class="post-category" href="/category/cpp/">C++</a>
+        </div>
+        <h1 class="post-title">ThreadSafeQueueLib: Lock-Free MPMC Queue in C++</h1>
+        <p class="post-summary">
+          That time I got reincarnated as a lock-free queue library implementer. This project turned into a serious lesson in memory ordering, false sharing, and how much operating systems background helps once concurrency stops being theoretical.
+        </p>
+      </header>
+
+      <section class="content-block">
+        <h2 class="section-title">Table of Contents</h2>
+        <nav class="toc" data-toc-target=".post-body"></nav>
+      </section>
+
+      <article class="post-body">
+        <h2>Overview</h2>
+        <p>
+          I started this project to understand concurrent queue design properly instead of repeating stock phrases about lock-free code being fast.
+          Very quickly, it became clear that the interesting part is not just the queue itself. It is the combination of interface design, cache behavior, progress guarantees, and the memory model.
+        </p>
+
+        <h2>Motivation</h2>
+        <p>
+          A standard queue interface becomes fragile under contention. Something as ordinary as checking <code>empty()</code> before <code>front()</code> and <code>pop()</code> is not a real plan once another thread can mutate the structure in between.
+          I wanted to understand what a safer interface and a faster implementation actually demand.
+        </p>
+
+        <h2>Design Decisions</h2>
+        <h3>Why lock-free?</h3>
+        <p>
+          Mutex-based queues are much easier to write and reason about. The lock-free route only makes sense if the learning goal is precisely to understand progress guarantees, contention, and the parts of the design where performance meets correctness.
+        </p>
+
+        <h3>Bounded versus unbounded</h3>
+        <p>
+          Bounded queues are attractive because the memory is fixed and predictable. Unbounded queues avoid the full-buffer problem but push you toward allocation and reclamation concerns that are easy to underestimate.
+        </p>
+
+        <h3>Compile-time configuration</h3>
+        <p>
+          I prefer selecting queue behavior through templates rather than runtime polymorphism. The compiler should know what variant is being built and optimize around those assumptions directly.
+        </p>
+
+        <h2>The Hard Parts</h2>
+        <h3>Memory ordering</h3>
+        <p>
+          The C++ memory model is where this project stopped being theoretical. Using <code>seq_cst</code> everywhere is not design, it is temporary avoidance.
+          The real work is deciding where acquire-release is enough and where relaxed operations are still correct.
+        </p>
+
+        <h3>False sharing</h3>
+        <p>
+          Producer and consumer indices sharing a cache line can quietly destroy throughput through invalidation traffic.
+          Once you see it in practice, "aligning state properly" stops sounding like a small optimization and starts looking like basic queue hygiene.
+        </p>
+
+        <h3>Debugging concurrency</h3>
+        <p>
+          Concurrency bugs are good at creating false confidence. A thousand clean runs do not mean much. Stress tests, invariant checks, and ThreadSanitizer matter because the failure cases are exactly the ones you do not see often enough.
+        </p>
+
+        <h2>Behind the Project</h2>
+        <p>
+          The project also pushed me back into systems reading. I needed stronger OS and architecture intuition to reason cleanly about what the queue was doing under the hood.
+          That is why this post naturally links to the <a href="/blog/OS/">Computer Architecture &amp; OS</a> note and the broader <a href="/blog/cpp-part1/">C++ series</a>.
+        </p>
+
+        <h2>What Is Next</h2>
+        <p>
+          I still want deeper evaluation, more benchmarking, and cleaner write-ups around the parts that currently live as implementation notes.
+          The goal is not just a queue that works, but a queue that I can explain without hand-waving the hard bits away.
+        </p>
+      </article>
+
+      <nav class="post-pagination">
+        <a href="/blog/cpp-part1/">Prev: C++ Part 1</a>
+        <a href="/blog/OS/">Next: Systems Reading List</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>

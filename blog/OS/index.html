@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>Computer Architecture &amp; OS: Where My Brain Meets the Memory Wall | Badri Bishal Das</title>
+  <meta name="description" content="A compact list of operating systems and computer architecture resources used by Badri Bishal Das while learning concurrency and systems programming.">
+  <link rel="canonical" href="https://www.badribishaldas.in/blog/OS/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Computer Architecture &amp; OS: Where My Brain Meets the Memory Wall | Badri Bishal Das">
+  <meta property="og:description" content="A systems reading list for architecture, memory hierarchy, and operating systems.">
+  <meta property="og:url" content="https://www.badribishaldas.in/blog/OS/">
+  <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+
+      <a class="back-link" href="/blogs/">All Posts</a>
+
+      <header class="post-header">
+        <div class="post-meta">
+          <span class="post-date">APR 01, 2026</span>
+          <a class="post-category" href="/category/systems/">SYSTEMS</a>
+        </div>
+        <h1 class="post-title">Computer Architecture &amp; OS: Where My Brain Meets the Memory Wall</h1>
+        <p class="post-summary">
+          A compact reading list for operating systems, architecture, and memory hierarchy. This is the background material that keeps making the C++ concurrency work feel less mysterious.
+        </p>
+      </header>
+
+      <section class="content-block">
+        <h2 class="section-title">Table of Contents</h2>
+        <nav class="toc" data-toc-target=".post-body"></nav>
+      </section>
+
+      <article class="post-body">
+        <h2>Overview</h2>
+        <p>
+          I originally started this list because I wanted better context for concurrency in C++.
+          It turned out to be useful well beyond that. Once caches, virtual memory, scheduling, and coherence protocols stop being background words, the systems picture becomes easier to reason about.
+        </p>
+
+        <h2>Operating Systems</h2>
+        <ul>
+          <li><strong>Operating Systems: Three Easy Pieces</strong> is my primary OS resource right now.</li>
+          <li><em>Operating System Concepts</em>.</li>
+          <li><em>Operating Systems: Principles and Practice</em>.</li>
+          <li><em>OS Volume 1: Kernels and Processes</em>.</li>
+          <li><em>OS Volume 2: Concurrency</em>.</li>
+          <li><em>OS Volume 3: Memory Management</em>.</li>
+          <li><em>OS Volume 4: Persistence</em>.</li>
+          <li>Professor Sarangi's operating systems material.</li>
+        </ul>
+
+        <h3>Channels I keep revisiting</h3>
+        <p>
+          <a href="https://www.youtube.com/@CoreDumpped" target="_blank" rel="noreferrer">Core Dumped</a> is still one of my favorite channels for OS visualizations.
+        </p>
+
+        <h2>Computer Architecture</h2>
+        <ul>
+          <li><em>Computer Architecture</em> by Hennessy and Patterson.</li>
+          <li><em>Computer Organization and Design</em>.</li>
+          <li><em>Computer Systems: A Programmer's Perspective</em>.</li>
+          <li><em>Inside the Machine</em> by Jon Stokes.</li>
+          <li><em>A Primer on Memory Consistency and Cache Coherence</em>.</li>
+          <li>IIT Delhi architecture notes and memory hierarchy material.</li>
+        </ul>
+
+        <h2>How It Connects Back</h2>
+        <p>
+          This note exists because <a href="/blog/threadSafeQueue/">ThreadSafeQueueLib</a> kept creating questions that were really architecture and OS questions in disguise.
+          It also sits next to the <a href="/blog/cpp-part1/">C++ series</a> because the language-level reasoning is cleaner once the lower-level behavior is less vague.
+        </p>
+      </article>
+
+      <nav class="post-pagination">
+        <a href="/blog/threadSafeQueue/">Prev: ThreadSafeQueueLib</a>
+        <a href="/blog/CNNfromScratch/">Next: CNN from Scratch</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>

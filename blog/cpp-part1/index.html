@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>C++ Part 1: The Beginning of the End | Badri Bishal Das</title>
+  <meta name="description" content="Part 1 of Badri Bishal Das's C++ series, covering resources, books, and the topics currently shaping his understanding of modern C++.">
+  <link rel="canonical" href="https://www.badribishaldas.in/blog/cpp-part1/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="C++ Part 1: The Beginning of the End | Badri Bishal Das">
+  <meta property="og:description" content="The first post in a C++ series on learning resources, books, and the questions worth chasing deeper.">
+  <meta property="og:url" content="https://www.badribishaldas.in/blog/cpp-part1/">
+  <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+
+      <a class="back-link" href="/blogs/">All Posts</a>
+
+      <header class="post-header">
+        <div class="post-meta">
+          <span class="post-date">APR 02, 2026</span>
+          <a class="post-category" href="/category/cpp/">C++</a>
+        </div>
+        <h1 class="post-title">C++ Part 1: The Beginning of the End</h1>
+        <p class="post-summary">
+          That time I got reincarnated as a C++ dev. This is the first note in a series about the resources I trust, the books I keep nearby, and the parts of the language that still feel worth wrestling with.
+        </p>
+      </header>
+
+      <section class="content-block">
+        <h2 class="section-title">Table of Contents</h2>
+        <nav class="toc" data-toc-target=".post-body"></nav>
+      </section>
+
+      <article class="post-body">
+        <h2>Overview</h2>
+        <p>
+          I wanted one place on the site where every C++ part could live without being buried inside a generic list of posts.
+          This is that starting point. The point is not to pretend I already understand the whole language. The point is to track the resources, questions, and implementation details that are actually moving my understanding forward.
+        </p>
+
+        <h2>Where I Am Learning From</h2>
+        <p>
+          I keep coming back to resources that are practical, opinionated, and written by people who clearly use C++ for real work instead of treating it like a museum piece.
+        </p>
+        <ul>
+          <li><a href="https://www.youtube.com/playlist?list=PLs3KjaCtOwSY34fFKyhOFovFlB7LikDwe" target="_blank" rel="noreferrer">C++ Weekly</a> for tight modern C++ details.</li>
+          <li><a href="https://www.youtube.com/@cppcon" target="_blank" rel="noreferrer">CppCon</a> for both deep talks and the back-to-basics sessions.</li>
+          <li><a href="https://www.youtube.com/@TheCherno" target="_blank" rel="noreferrer">The Cherno</a> when I want a faster explanation before going deeper elsewhere.</li>
+          <li><a href="https://www.youtube.com/@MikeShah" target="_blank" rel="noreferrer">Mike Shah</a> for systems-heavy material.</li>
+          <li><a href="https://www.youtube.com/@NotesByNick" target="_blank" rel="noreferrer">NotesByNick</a> for focused topic breakdowns.</li>
+        </ul>
+
+        <h3>What helps the most</h3>
+        <p>
+          The best resources are the ones that connect language rules back to actual program behavior: performance, object lifetime, undefined behavior, API design, and tradeoffs that survive outside toy examples.
+        </p>
+
+        <h2>Helpful Books</h2>
+        <ul>
+          <li><em>Effective Modern C++</em> by Scott Meyers.</li>
+          <li><em>Beautiful C++</em>.</li>
+          <li><em>C++20 Software Design</em> by Klaus Iglberger.</li>
+          <li><em>C++ Templates: The Complete Guide</em>, which feels more like a long-term project than a casual read.</li>
+          <li><em>C++ Concurrency in Action</em> by Anthony Williams.</li>
+        </ul>
+
+        <h2>Current State</h2>
+        <p>
+          Right now, a lot of my C++ learning is tied directly to <a href="/blog/threadSafeQueue/">ThreadSafeQueueLib</a>.
+          That project pushed me toward the C++ memory model, lock-free data structures, and eventually toward operating systems and architecture material because the concurrency side gets much clearer when the systems background is stronger.
+        </p>
+        <p>
+          That is why the <a href="/blog/OS/">systems reading list</a> exists next to this series.
+          The two are linked. The project raises questions, the systems background answers some of them, and then C++ raises newer and worse questions.
+        </p>
+
+        <h2>What Comes Next</h2>
+        <p>The next parts in this series should get narrower and more useful. The most natural follow-ups are:</p>
+        <ul>
+          <li>Virtual destructors and object lifetime.</li>
+          <li>Public inheritance versus private inheritance.</li>
+          <li>The memory model, especially where intuition breaks down.</li>
+          <li>Templates and API design for code that wants zero-cost abstractions without becoming unreadable.</li>
+        </ul>
+      </article>
+
+      <nav class="post-pagination">
+        <a href="/blog/threadSafeQueue/">Next: ThreadSafeQueueLib</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>

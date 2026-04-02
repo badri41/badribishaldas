@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>Misc | Badri Bishal Das</title>
+  <meta name="description" content="Miscellaneous posts by Badri Bishal Das.">
+  <link rel="canonical" href="https://www.badribishaldas.in/category/misc/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+      <header class="page-intro">
+        <h1 class="page-title">Misc</h1>
+        <p class="page-summary">Implementation-focused posts that do not fit cleanly into the systems bucket.</p>
+      </header>
+      <ul class="category-links">
+        <li><a href="/blogs/">All Posts</a></li>
+        <li><a href="/category/cpp/">C++</a></li>
+        <li><a href="/category/systems/">Systems</a></li>
+        <li><a class="active" href="/category/misc/">Misc</a></li>
+      </ul>
+      <div class="blog-list">
+        <blog-card
+          date="MAR 29, 2026"
+          category="MISC"
+          category-href="/category/misc/"
+          href="/blog/CNNfromScratch/"
+          title="CNN from Scratch"
+          description="Building a convolutional neural network with only NumPy, backpropagation, and enough manual debugging to make the abstractions feel earned."></blog-card>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
