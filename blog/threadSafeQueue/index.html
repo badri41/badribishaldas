@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
-  <title>ThreadSafeQueueLib: Lock-Free MPMC Queue in C++ | Badri Bishal Das</title>
+  <title>ThreadSafeQueueLib: A Concurrent Queue Library in C++ | Badri Bishal Das</title>
   <meta name="description" content="A project write-up on building a lock-free MPMC queue in C++, including memory ordering, false sharing, debugging, and systems background.">
   <link rel="canonical" href="https://www.badribishaldas.in/blog/threadSafeQueue/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <meta property="og:title" content="ThreadSafeQueueLib: Lock-Free MPMC Queue in C++ | Badri Bishal Das">
+  <meta property="og:title" content="ThreadSafeQueueLib: A Concurrent Queue Library in C++ | Badri Bishal Das">
   <meta property="og:description" content="A project log on lock-free queue design, memory ordering, and the systems knowledge needed to reason about it properly.">
   <meta property="og:url" content="https://www.badribishaldas.in/blog/threadSafeQueue/">
   <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
@@ -30,7 +30,7 @@
           <span class="post-date">APR 02, 2026</span>
           <a class="post-category" href="/category/cpp/">C++</a>
         </div>
-        <h1 class="post-title">ThreadSafeQueueLib: Lock-Free MPMC Queue in C++</h1>
+        <h1 class="post-title">ThreadSafeQueueLib: A Concurrent Queue Library in C++</h1>
         <p class="post-summary">
           That time I got reincarnated as a lock-free queue library implementer. This project turned into a serious lesson in memory ordering, false sharing, and how much operating systems background helps once concurrency stops being theoretical.
         </p>
