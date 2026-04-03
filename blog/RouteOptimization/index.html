@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>RouteOptimizationChallenge: A HVRPSTDW Solver in C++ | Badri Bishal Das</title>
+  <meta name="description" content="A project log on Kriti 26' Route Optimization Challenge: designing a C++ hybrid metaheuristic solver for HVRPSTDW with greedy construction, simulated annealing, and strong baseline improvements.">
+  <link rel="canonical" href="https://www.badribishaldas.in/blog/RouteOptimization/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="RouteOptimizationChallenge: A HVRPSTDW Solver in C++ | Badri Bishal Das">
+  <meta property="og:description" content="A competition project log on building a full-stack HVRPSTDW solver in C++ with a four-phase hybrid metaheuristic and strong benchmark gains.">
+  <meta property="og:url" content="https://www.badribishaldas.in/blog/RouteOptimization/">
+  <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+
+      <a class="back-link" href="/blogs/">All Posts</a>
+
+      <header class="post-header">
+        <div class="post-meta">
+          <span class="post-date">APR 02, 2026</span>
+          <a class="post-category" href="/category/cpp/">C++</a>
+        </div>
+        <h1 class="post-title">RouteOptimizationChallenge: A HVRPSTDW Solver in C++</h1>
+        <p class="post-summary">
+          From Jan 2026 to Mar 2026, at Kriti 26' (IIT Guwahati), our hostel team of 6 (me as project head, 2 sophomores, 3 freshers) built a full-stack web application for a hard optimization track focused on employee transportation planning.
+          The core was a C++ solver for the Heterogeneous Vehicle Routing Problem with Simultaneous Pickup and Delivery, Time Windows, and Driver Constraints (HVRPSTDW).
+        </p>
+      </header>
+
+      <section class="content-block">
+        <h2 class="section-title">Table of Contents</h2>
+        <nav class="toc" data-toc-target=".post-body"></nav>
+      </section>
+
+      <section class="content-block">
+        <h2 class="section-title">Project Links</h2>
+        <p>
+          Repository: <a href="https://github.com/badri41/VeloraMobilityOptimizer" target="_blank" rel="noreferrer">github.com/badri41/VeloraMobilityOptimizer</a><br>
+          Live Deployment: <a href="https://velorafrontend-kri-2651-ti.onrender.com/" target="_blank" rel="noreferrer">velorafrontend-kri-2651-ti.onrender.com</a><br>
+          YouTube Demo: <a href="https://www.youtube.com/watch?v=4BbK0500LLs" target="_blank" rel="noreferrer">watch demo</a>
+        </p>
+      </section>
+
+      <article class="post-body">
+        <h2>Overview</h2>
+
+        <p>
+          This challenge combined product engineering and algorithmic optimization. We had to deliver a usable web interface while also designing a competitive solver for an NP-hard routing problem.
+          The task was not just "find routes", but find cost-efficient, feasible routes across a heterogeneous fleet under realistic operational constraints.
+          The codebase for this work is available in the <a href="https://github.com/badri41/VeloraMobilityOptimizer" target="_blank" rel="noreferrer">VeloraMobilityOptimizer repository</a>, and the frontend is available at the <a href="https://velorafrontend-kri-2651-ti.onrender.com/" target="_blank" rel="noreferrer">live Render deployment</a>.
+        </p>
+
+        <h2>Problem Setting</h2>
+        <p>
+          The optimization target was corporate employee transport. Vehicles had different capacities and costs, requests included simultaneous pickup and delivery behavior, and schedules needed to respect soft time windows and driver-side feasibility constraints.
+          We modeled violations through penalties, turning route quality into a penalty-aware objective instead of a simplistic distance-only target.
+        </p>
+
+        <h2>Solver Design</h2>
+        <h3>Hybrid Metaheuristic in C++</h3>
+        <p>
+          We designed a hybrid metaheuristic solver in C++ to balance solution quality and runtime. Exact methods were not practical at competition scale, so the focus was on generating high-quality feasible plans quickly and then iteratively improving them.
+        </p>
+
+        <h3>Phase 1: Initial Solution Construction</h3>
+        <p>
+          We used a multi-start Solomon I1-style greedy insertion approach with up to 20 restarts. Each restart shuffles requests inside priority buckets, then inserts them one-by-one at the cheapest feasible position across all vehicles.
+          The best solution among all restarts is retained as the starting point for downstream improvement.
+        </p>
+
+        <h3>Phase 2: Simulated Annealing Improvement</h3>
+        <p>
+          We then ran deterministic Simulated Annealing (seed = 42) with Metropolis acceptance and a maxNoImprove stopping condition, so runs remain reproducible.
+          Temperature scales with instance complexity: <code>T0 = min(0.3 x cost, 1000)</code>, cooling <code>alpha = 0.99</code>, with adaptive reheating every <code>maxNoImprove / 3</code> stagnant steps.
+        </p>
+
+        <h3>Neighborhood Operators</h3>
+        <p>
+          The SA phase uses 5 weighted operators:
+          <code>Greedy Relocate (28%)</code>,
+          <code>Intra-Route Relocate (28%)</code>,
+          <code>Exchange (18%)</code>,
+          <code>2-Opt (13%)</code>, and
+          <code>Or-Opt (13%)</code>.
+          This gives a stable balance between route-level restructuring and fine local edits.
+        </p>
+
+        <h3>Phase 3: Adaptive Large Neighborhood Search (ALNS)</h3>
+        <p>
+          After SA, we run a time-bounded ALNS destroy-repair loop using Ropke and Pisinger style adaptive scoring
+          with <code>sigma1 = 33</code>, <code>sigma2 = 9</code>, <code>sigma3 = 3</code>, and reaction factor <code>lambda = 0.8</code>.
+          Destroy operators are:
+          <code>Shaw Removal</code> (seed + nearest related requests),
+          <code>Random Removal</code> (diversification), and
+          <code>Route Removal</code> (drop the most-penalized route to escape plateaus).
+          Repair is performed with Regret-2 insertion, prioritizing requests with the largest gap between second-best and best insertion cost.
+          In practice this pushes tightly constrained requests earlier and improves robustness under soft-window penalties.
+        </p>
+
+        <h3>Phase 4: Post-ALNS SA Polish</h3>
+        <p>
+          We restart SA from the ALNS best solution with a shorter <code>maxNoImprove</code> budget for fine-grained polishing.
+          This phase focuses on last-mile local gains, then keeps whichever solution is better between ALNS output and post-ALNS SA.
+        </p>
+
+        <h2>Objective and Constraints</h2>
+        <p>
+          The objective combined routing cost and penalty terms for soft-constraint violations. The solver continuously traded off feasibility pressure and cost pressure, which was essential for converging toward practically valid schedules under tight constraints.
+        </p>
+
+        <h2>Distance Computation</h2>
+        <p>
+          Distances are precomputed once into an <code>N x N</code> matrix and then read in <code>O(1)</code> during SA and ALNS.
+          For realistic travel-time geometry, we use OSRM Table API in a single matrix request (roughly 5-20s precompute depending on instance size).
+          For quick iteration, we also support Haversine straight-line distances.
+        </p>
+
+        <h2>Results</h2>
+        <p>
+          Across benchmark cases, the final solver achieved roughly 74.9%-88.6% lower transport cost than baseline.
+          We also observed fleet usage reductions of up to 50% on selected instances.
+          The results validated the full 4-phase pipeline: multi-start construction, SA exploration, ALNS diversification, and post-ALNS local polish.
+        </p>
+
+        <h2>Technical Report</h2>
+        <p>
+          We documented the full formulation and methodology in a 25-page technical report, including constraints, objective design, heuristic details, and experimental behavior.
+          Writing the report was a major part of the project because it forced us to justify each modeling and optimization choice rigorously.
+        </p>
+
+        <h2>What I Learned</h2>
+        <p>
+          This challenge taught me that good optimization systems are as much about modeling discipline as algorithm selection.
+          A clean objective, realistic penalties, and robust neighborhood design mattered more than chasing complicated machinery.
+          It also reinforced how useful C++ is for fast iterative solvers when you need performance and control.
+        </p>
+      </article>
+
+      <nav class="post-pagination">
+        <a href="/blog/cpp-part1/">Prev: C++ Part 1</a>
+        <a href="/blog/OS/">Next: Systems Reading List</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>
