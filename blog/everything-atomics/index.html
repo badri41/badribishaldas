@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';</script>
+  <title>C++ Episode 3: Everything I Know About std::atomic and Lock-Free Programming | Badri Bishal Das</title>
+  <meta name="description" content="C++ Episode 3 notes on atomics, memory ordering, happens-before, CAS, lock-free vs wait-free guarantees, and practical correctness rules.">
+  <link rel="canonical" href="https://www.badribishaldas.in/blog/everything-atomics/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="C++ Episode 3: Everything I Know About std::atomic and Lock-Free Programming | Badri Bishal Das">
+  <meta property="og:description" content="A practical walkthrough of C++ atomics: reordering, memory model, acquire-release, seq_cst, CAS semantics, and progress guarantees.">
+  <meta property="og:url" content="https://www.badribishaldas.in/blog/everything-atomics/">
+  <meta property="og:image" content="https://www.badribishaldas.in/assets/images/photo.jpg">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <theme-toggle></theme-toggle>
+  <div class="page-shell">
+    <site-sidebar page="blogs"></site-sidebar>
+
+    <main class="page-content">
+      <mobile-nav page="blogs"></mobile-nav>
+
+      <a class="back-link" href="/blogs/">All Posts</a>
+
+      <header class="post-header">
+        <div class="post-meta">
+          <span class="post-date">APR 05, 2026</span>
+          <a class="post-category" href="/category/cpp/">C++</a>
+        </div>
+        <h1 class="post-title">C++ Episode 3: Everything I Know About std::atomic and Lock-Free Programming</h1>
+        <p class="post-summary">
+          This blog post is not trying to repeat Fedor Pikus's talk. I am trying to extend into the not-so-simple part of memory ordering and connect it directly to computer architecture and the C++ memory model.
+        </p>
+      </header>
+
+      <section class="content-block">
+        <h2 class="section-title">Table of Contents</h2>
+        <nav class="toc" data-toc-target=".post-body"></nav>
+      </section>
+
+      <article class="post-body">
+        <h2>Prerequisites</h2>
+        <p>
+          Before reading this post, I strongly recommend finishing these prerequisites first.
+          This blog builds on them and is meant as an extension, not a replacement.
+        </p>
+        <ul>
+          <li><em>C++ Concurrency in Action</em>, Chapters 2 and 3</li>
+          <li>
+            Fedor Pikus, CppCon 2017: <a href="https://www.youtube.com/watch?v=ZQFzMfHIxng" target="_blank" rel="noreferrer">C++ atomics, from basic to advanced. What do they really do?</a>
+          </li>
+        </ul>
+
+        <h2>Why This Post Exists</h2>
+        <p>I want a place to document my notes while learning about C++ atomics and lock-free programming.</p>
+
+        <h2>Before Atomics: Why Reordering Exists</h2>
+        <p>
+          CPUs and compilers are built for throughput, not source-level instruction order. They exploit independent work,
+          hide memory latency, and keep pipelines busy. The key rule is if the single-thread behaviour is preserved, they can reorder instructions freely.
+        </p>
+
+        <h3>Compiler Reordering</h3>
+        <p>
+          The compiler can reorder independent instructions for optimization, register allocation, and scheduling.
+          Without atomic operations or fences, it does not need to preserve inter-thread intent.
+        </p>
+
+        <h3>CPU Out-of-Order Execution</h3>
+        <p>
+          Hardware may execute independent instructions early and retire them in a way that preserves local program semantics.
+          Internally, execution order can differ from source order.
+        </p>
+
+        <h3>Memory Reordering (The Concurrency Problem)</h3>
+        <p>
+          Across cores, loads and stores can become visible in unexpected orders due to store buffers, cache effects,
+          and architecture-specific rules. This is the reordering that breaks naive shared-state code.
+        </p>
+        <h3>Store Buffering</h3>
+        <p>
+            where each core keeps recent writes in a private buffer until they are flushed to the shared cache
+        </p>
+
+        <h3>Cache Coherence and MESI (Quick Intuition)</h3>
+        <p>
+          Cache coherence is the mechanism that keeps copies of the same memory location consistent across cores.
+          If Core 1 updates a cache line, other cores must not keep reading stale values forever.
+          Coherence protocols coordinate this process using line states and invalidations.
+        </p>
+        <p>
+          A simple mental model is MESI: Modified, Exclusive, Shared, Invalid.
+          A write often forces invalidations on other cores, and that coherence traffic can become expensive under contention.
+          This is one reason lock-free code can still perform badly when many threads constantly fight over the same cache line.
+        </p>
+        <figure>
+          <img src="/assets/images/MESI.png" alt="MOESI and MESI-style cache coherence state intuition diagram">
+          <figcaption class="subtle">Cache coherence state model intuition (MESI/MOESI family).</figcaption>
+        </figure>
+
+        <h3>False Sharing and C++17 Interference Sizes</h3>
+        <p>
+          False sharing happens when two independent variables used by different threads are placed on the same cache line.
+          Even though the variables are logically unrelated, writes from one thread invalidate the line for the other thread,
+          causing heavy coherence traffic and performance collapse.
+        </p>
+        <p>
+          C++17 provides <code>std::hardware_destructive_interference_size</code> in <code>&lt;new&gt;</code>.
+          It represents a conservative spacing value (commonly 64-256 bytes depending on platform) to separate hot fields and reduce false sharing.
+        </p>
+        <figure>
+          <img src="/assets/images/FalseSharing.png" alt="False sharing versus mitigated false sharing across cache lines">
+          <figcaption class="subtle">False sharing causes cache-line ping-pong; padding/alignment separates hot fields.</figcaption>
+        </figure>
+        <pre><code class="language-cpp">#include &lt;atomic&gt;
+#include &lt;new&gt;
+
+struct alignas(std::hardware_destructive_interference_size) Counter {
+    std::atomic&lt;std::uint64_t&gt; value{0};
+};
+
+Counter producer_counter;
+Counter consumer_counter;
+</code></pre>
+        <p>
+          The idea is simple: keep frequently written per-thread data far enough apart so they do not ping-pong the same cache line.
+        </p>
+        <h2>The Happens-Before Relation in C++</h2>
+        <p>
+          In concurrent code, assume operations can be observed out of order unless you create ordering explicitly.
+          In C++, that ordering is expressed through the happens-before relation.
+        </p>
+        <p>If A happens-before B, then:</p>
+        <ul>
+          <li>A's effects are visible to B.</li>
+          <li>B cannot observe a state before A.</li>
+        </ul>
+        <p>
+          If conflicting writes and accesses are not ordered by happens-before, that is a data race and the program has undefined behavior.
+        </p>
+
+        <h2>C++ Memory Model in One View</h2>
+        <p>
+          Since C++11, the language defines atomic operations and ordering guarantees independent of any one compiler or CPU.
+          Atomics in <code>&lt;atomic&gt;</code> provide race-free shared access when used correctly.
+        </p>
+
+        <h2>But what is Memory Ordering?</h2>
+        <p>
+            Memory ordering is about controlling visibility and ordering of operations across threads. It defines how one thread's writes become visible to another thread's reads.
+            Sure the atomic variable is lock-free, but suppose the atomic variable controls a non-atomic data/memory. Read/write to the non-atomic data can be reordered and 
+            there is no guarantee that the other thread will see the updated data when it sees the updated atomic variable. This is where memory ordering comes into play.            
+        </p>
+
+        <h3>The Memory Orders</h3>
+        <ul>
+          <li><code>memory_order_relaxed</code>: atomicity only, no inter-thread ordering.</li>
+          <li><code>memory_order_consume</code>: data-dependency ordering; effectively treated as acquire by mainstream compilers today.</li>
+          <li><code>memory_order_acquire</code>: prevents later operations from moving before the load/RMW.</li>
+          <li><code>memory_order_release</code>: prevents earlier operations from moving after the store/RMW.</li>
+          <li><code>memory_order_acq_rel</code>: both acquire and release on RMW operations.</li>
+          <li><code>memory_order_seq_cst</code>: strongest model, including a single global order of seq_cst operations.</li>
+        </ul>
+
+        <h2>Acquire-Release: The Core Pair</h2>
+        <p>
+          Release on the producer and acquire on the consumer is the standard publish-subscribe pattern.
+          If an acquire load sees the value written by a release store, then all writes sequenced-before that release become visible.
+        </p>
+        <pre><code class="language-cpp">std::atomic&lt;bool&gt; ready{false};
+int data = 0;
+
+// Producer
+void t1() {
+    data = 42;
+    ready.store(true, std::memory_order_release);
+}
+
+// Consumer
+void t2() {
+    while (!ready.load(std::memory_order_acquire)) {}
+    // guaranteed to see data == 42
+    std::cout &lt;&lt; data &lt;&lt; '\n';
+}</code></pre>
+
+        <h2>What seq_cst Adds</h2>
+        <p>
+          <code>seq_cst</code> gives acquire/release style barriers plus one extra global property:
+          all seq_cst operations appear in a single total order seen consistently by all threads.
+          This simplifies reasoning and rules out some outcomes allowed by weaker orders.
+        </p>
+
+        <h2>Acquire-Release vs Sequential Consistency</h2>
+        <h3>Acquire-Release</h3>
+        <p>Guarantees:</p>
+        <ul>
+          <li>Creates happens-before between specific synchronizing threads.</li>
+          <li>Ensures visibility of prior writes across that synchronization edge.</li>
+        </ul>
+        <p>But:</p>
+        <ul>
+          <li>No single global ordering across all threads.</li>
+          <li>Different threads may observe operations in different relative orders.</li>
+        </ul>
+
+        <h3>Sequential Consistency (seq_cst)</h3>
+        <p>Guarantees:</p>
+        <ul>
+          <li>All <code>seq_cst</code> operations appear in one global total order that every thread agrees on.</li>
+          <li>Still retains acquire/release-style ordering for those operations.</li>
+        </ul>
+        <p>
+          In short: <code>seq_cst</code> adds a global ordering constraint on top of acquire-release behavior.
+        </p>
+
+        <h2>When acq_rel Is Enough</h2>
+        <p>
+          Use <code>acq_rel</code> for read-modify-write operations when you need two-way ordering,
+          but do not need the global total order guarantee of <code>seq_cst</code>.
+          Common examples include <code>fetch_add</code> and compare-exchange loops in lock-free algorithms.
+        </p>
+
+        <h2>Relaxed Ordering: Useful but Easy to Misuse</h2>
+        <p>
+          Relaxed operations are atomic but do not publish ordering to other memory locations.
+          Great for counters, IDs, and statistics where relative order does not matter.
+          Wrong choice for "flag means data is ready" signaling.
+        </p>
+
+        <h2>CAS (Compare-And-Swap) Properly Understood</h2>
+        <p>
+          Compare-and-swap updates atomics conditionally.
+        </p>
+        <pre><code class="language-cpp">bool ok = x.compare_exchange_strong(expected, desired);</code></pre>
+        <ul>
+          <li>If <code>x == expected</code>, writes <code>desired</code> and returns true.</li>
+          <li>If not equal, writes current <code>x</code> into <code>expected</code> and returns false.</li>
+        </ul>
+
+        <h3>The Important CAS Detail</h3>
+        <p>
+          On failure, <code>expected</code> is overwritten with the observed value. This is why retry loops work naturally:
+        </p>
+        <pre><code class="language-cpp">int expected = old_value;
+while (!x.compare_exchange_weak(expected, new_value,
+                                std::memory_order_acq_rel,
+                                std::memory_order_acquire)) {
+    // expected is refreshed for the next attempt
+}</code></pre>
+
+        <h3>Weak vs Strong: Retry vs Decision Semantics</h3>
+        <p>
+          <code>compare_exchange_weak</code> is allowed to fail spuriously, meaning it may report failure even when
+          the current value equals the expected value. In contrast, <code>compare_exchange_strong</code> fails only
+          when the comparison genuinely fails.
+        </p>
+        <p>
+          This leads to two usage patterns.
+          <code>compare_exchange_weak</code> is designed for retry semantics and is typically used in a loop where
+          failure (real or spurious) simply triggers another attempt.
+        </p>
+        <pre><code class="language-cpp">int expected = old_value;
+while (!x.compare_exchange_weak(expected, new_value,
+                                std::memory_order_acq_rel,
+                                std::memory_order_acquire)) {
+    // retry
+}</code></pre>
+        <p>
+          In this pattern, spurious failure is harmless. More importantly, when failure is due to a real mismatch,
+          it means another thread has modified the shared state. That is the core lock-free progress idea:
+          one thread may fail, but some thread is making progress.
+        </p>
+        <p>
+          <code>compare_exchange_strong</code> is better for decision semantics, where one attempt decides control flow.
+        </p>
+        <pre><code class="language-cpp">if (x.compare_exchange_strong(expected, new_value)) {
+    // success path
+} else {
+    // definite mismatch
+}</code></pre>
+        <p>
+          A failure here reliably means the expected value did not match, not an artifact of spurious failure.
+        </p>
+        <p>
+          Important caveat: retry-based designs can still spin indefinitely if the expected value never becomes true again.
+), but it shows that lock-free does not imply fairness
+          or starvation-freedom for every individual thread.
+        </p>
+
+        <h2>Progress Guarantees: Lock-Free vs Wait-Free</h2>
+        <ul>
+          <li><strong>Lock-free</strong>: system-wide progress, at least one thread completes in finite steps.</li>
+          <li><strong>Wait-free</strong>: per-thread progress, every thread completes in finite steps.</li>
+        </ul>
+        <p>
+          Wait-free is stronger. It is about bounded steps, not wall-clock time.
+        </p>
+
+
+
+        <h2>References</h2>
+        <ul>
+          <li><em>C++ Concurrency in Action</em> (Chapters 5-7)</li>
+          <li><a href="https://en.cppreference.com/w/cpp/atomic/memory_order" target="_blank" rel="noreferrer">cppreference: memory_order</a></li>
+          <li><a href="https://www.youtube.com/watch?v=ZQFzMfHIxng" target="_blank" rel="noreferrer">CppCon 2017 - C++ atomics from basic to advanced (Fedor Pikus)</a></li>
+          <li><a href="https://cpp-alchemy.com/posts/memory-order/" target="_blank" rel="noreferrer">A great blog on memory ordering</a></li>
+        </ul>
+      </article>
+
+      <nav class="post-pagination">
+        <a href="/blog/runtime-dispatch-polymorphism/">Prev: C++ Episode 2</a>
+        <a href="/blog/threadSafeQueue/">Next: ThreadSafeQueueLib</a>
+      </nav>
+    </main>
+  </div>
+</body>
+</html>
