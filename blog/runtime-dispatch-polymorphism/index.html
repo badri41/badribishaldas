@@ -224,7 +224,7 @@ new (&amp;buffer_) Any{vehicle}; // placement new</code></pre>
           <li><code>constexpr</code> and templates for compile-time computation paths.</li>
         </ul>
         <p>
-          There is no universal winner. Pick based on extensibility, performance profile, binary boundaries, and readability.
+            Will explain in detail about CRTP in a future post, but the key idea is to use templates to achieve polymorphic behavior without virtual functions, at the cost of compile-time flexibility.
         </p>
         <h2>The Dispatch Landscape (Big Picture)</h2>
         <p>
