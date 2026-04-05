@@ -32,7 +32,7 @@
         </div>
         <h1 class="post-title">C++ Episode 2: Runtime Dispatch &amp; Polymorphism</h1>
         <p class="post-summary">
-          Episode 2 is about one core systems question: how do we handle behavior through a common interface when the implementation is ony known at runtime?
+          Episode 2 is about one core systems question: how do we handle behavior through a common interface when the implementation is only known at runtime?
           This post covers virtual dispatch, vtables, RTTI, type erasure, and when alternatives like CRTP or <code>std::visit</code> are a better fit.
         </p>
       </header>
@@ -56,9 +56,10 @@ for (auto* type : types) {
           Runtime dispatch decides which concrete implementation should execute.
         </p>
 
+
         <h2>C++'s Answer: Inheritance + Dynamic Binding</h2>
         <p>
-          In classic C++, runtime dispatch is built from inheritance and virtual functions using the 'virtual' keyword:
+          In classic C++, runtime dispatch is built from inheritance and virtual functions:
         </p>
         <pre><code class="language-cpp">class Vehicle {
 public:
@@ -76,6 +77,16 @@ public:
           A call through <code>Vehicle*</code> is resolved at runtime (runtime binding). The mechanism underneath is usually a per-type vtable and a hidden vptr inside polymorphic objects.
         </p>
 
+        <h2>Memory Layout (Mental Model)</h2>
+        <p>
+          A practical way to think about a polymorphic object: the object carries a hidden pointer (<code>vptr</code>) to a virtual table (<code>vtable</code>) that stores function pointers.
+          The following diagram shows the memory-level view of that relationship.
+        </p>
+        <figure>
+          <img src="/assets/images/memory_layout_diagram.png" alt="Memory layout diagram showing object vptr and vtable slots">
+          <figcaption class="subtle">Memory layout view: object vptr points to vtable entries for virtual calls.</figcaption>
+        </figure>
+
         <h2>What Is a Vtable, Really?</h2>
         <p>
           A useful mental model: a vtable is just a structure of function pointers.
@@ -92,30 +103,45 @@ vtable vtable_for = {
 };</code></pre>
         <p>
           Conceptually, a call site does three steps: read vptr, fetch function pointer from vtable slot, make an indirect call.
-          That flexibility is powerful, but not free, it has a Overhead.
+          That flexibility is powerful, but it has overhead.
         </p>
 
-        <figure>
-          <img src="/assets/images/vtablepic.png" alt="Diagram showing vptr and vtable relationship in virtual dispatch">
-          <figcaption class="subtle">Virtual dispatch map: object vptr points to table entries for virtual methods.</figcaption>
-        </figure>
+        <h2>What the Compiler Typically Emits</h2>
+        <p>
+          On many targets, a virtual call roughly looks like this at assembly level:
+        </p>
+        <pre><code class="language-cpp">mov rax, [rdi]        // load vptr from object
+call [rax + offset]   // indirect call via vtable slot</code></pre>
+        <p>
+          Exact instructions vary by compiler, optimization level, and ABI, but the indirect-call shape is the key idea.
+        </p>
 
-        <h2>Cost Model: Why Virtual Calls Have Overhead</h2>
+        <h2>Cost Model: Hot Path vs Cold Path</h2>
         <ul>
           <li>Extra pointer in each polymorphic object (the vptr).</li>
           <li>Indirect call through function pointer (harder for optimizer/inlining).</li>
           <li>Potential branch prediction and cache effects on hot paths.</li>
         </ul>
         <p>
-          In many applications this cost is tiny compared to I/O or higher-level logic. In very hot loops, you should measure and compare alternatives.
+          Critical distinction: in hot loops, virtual dispatch can matter; in cold paths, it is often irrelevant compared to I/O or higher-level latency.
+          Measure before optimizing.
         </p>
+
+        <h2>Devirtualization: When Virtual Becomes Direct</h2>
+        <p>
+          Compilers can sometimes remove virtual overhead by proving the dynamic type at compile time or at link time.
+          This optimization is called devirtualization.
+        </p>
+        <ul>
+          <li>Common enablers: <code>final</code>, whole-program optimization/LTO, and visible concrete types.</li>
+          <li>Result: a direct call (sometimes fully inlined) instead of vtable lookup.</li>
+        </ul>
 
         <h2>Virtual Destructor and override Matter</h2>
         <p>
           If a base class is intended for polymorphic deletion, it must have a public virtual destructor.
-          Otherwise deleting a derived object through base pointer is undefined behavior.
-          Point to note here is that making the destructor virtual doesn't mean that destructor can be overriden, in the traditional sense. The virtual keyword on the destructor ensures that the correct destructor 
-          is called for derived classes. 
+          Otherwise deleting a derived object through a base pointer is undefined behavior.
+          A virtual destructor ensures the correct derived destructor runs.
         </p>
         <pre><code class="language-cpp">class Base {
 public:
@@ -128,7 +154,7 @@ public:
     void f() override; // compile-time check for intended override
 };</code></pre>
         <p>
-          <code>override</code> keyword is optional but recommended as it prevents silent mistakes like mismatched signatures that create a new function instead of overriding.
+          <code>override</code> is optional but strongly recommended because it prevents silent mismatches in function signatures.
         </p>
 
         <h2>RTTI, Upcasting, and Downcasting</h2>
@@ -144,6 +170,20 @@ if (Derived* d = dynamic_cast&lt;Derived*&gt;(b)) {
 }</code></pre>
         <p>
           If RTTI is disabled (for example with <code>-fno-rtti</code>), tools like <code>dynamic_cast</code> and <code>typeid</code> become unavailable for this purpose.
+        </p>
+
+        <h2>ABI and Binary Compatibility (Why This Matters in Real Systems)</h2>
+        <p>
+          Vtable la
+          yout is ABI-dependent, meaning details differ across compilers/platform ABIs.
+          Still, virtual interfaces are heavily used for binary boundaries in:
+        </p>
+        <ul>
+          <li>plugin systems (host loads implementations at runtime),</li>
+          <li>shared libraries (behavior exposed behind stable interfaces).</li>
+        </ul>
+        <p>
+          This is where MLI becomes practical: runtime polymorphism helps independently built modules interoperate cleanly.
         </p>
 
         <h2>Type Erasure: Polymorphism Without Inheritance</h2>
@@ -177,44 +217,32 @@ new (&amp;buffer_) Any{vehicle}; // placement new</code></pre>
           Libraries like <code>std::function</code> commonly rely on SBO for small lambdas to improve locality and avoid allocation overhead.
         </p>
 
-        <h2>Alternatives You Should Know for Virtual Tables</h2>
+        <h2>Alternatives to Virtual Dispatch</h2>
         <ul>
-          <li>CRTP as in Curiously Recurring Template Pattern (wait for new blog on templates :P).</li>
+          <li>CRTP (Curiously Recurring Template Pattern) for compile-time polymorphism.</li>
           <li><code>std::variant</code> + <code>std::visit</code> for closed sets of types.</li>
           <li><code>constexpr</code> and templates for compile-time computation paths.</li>
         </ul>
         <p>
-            below is a table comparing these alternatives on key dimensions:
+          There is no universal winner. Pick based on extensibility, performance profile, binary boundaries, and readability.
         </p>
         <h2>The Dispatch Landscape (Big Picture)</h2>
         <p>
-            C++ offers multiple dispatch models, each with different trade-offs in flexibility, performance, and design.
-            <br><br>
-
-            <strong>DRY (Don’t Repeat Yourself):</strong><br>
-            Avoid duplicating code and reuse logic wherever possible.
-            <br><br>
-
-            <strong>RTB (Runtime Binding):</strong><br>
-            Function calls are resolved at runtime using mechanisms like virtual functions and vtables.
-            <br><br>
-
-            <strong>OFD (Open for Extension, Closed for Modification):</strong><br>
-            You can extend behavior without modifying existing code.
-            <br><br>
-
-            <strong>MLI (Multiple Library Integration):</strong><br>
-            Different modules or libraries should integrate cleanly without tight coupling.
-            <br><br>
-
-            <strong>AED (Adding Extra Data):</strong><br>
-            Types can be extended with additional data or behavior easily.
-            </p>
+          C++ offers multiple dispatch models, each with different trade-offs in flexibility, performance, and design.
+        </p>
+        <p>
+          <strong>DRY (Don’t Repeat Yourself):</strong> avoid duplicating type-specific logic.<br>
+          <strong>RTB (Runtime Binding):</strong> call target resolved at runtime (virtual/vtable path).<br>
+          <strong>OFD (Open for Extension, Closed for Modification):</strong> add behavior without rewriting existing paths.<br>
+          <strong>MLI (Multiple Library Integration):</strong> modules and libraries interact through stable interfaces.<br>
+          <strong>AED (Adding Extra Data):</strong> design can evolve with new behavior/data over time.
+        </p>
 
         <figure>
           <img src="/assets/images/DispatchTypes.png" alt="Diagram comparing runtime dispatch techniques">
           <figcaption class="subtle">Runtime dispatch options and where each model usually fits.</figcaption>
         </figure>
+
         <h2>Compiler Optimization Flags in Context</h2>
         <p>
           Optimization level affects how much overhead survives in generated code:
@@ -227,15 +255,11 @@ new (&amp;buffer_) Any{vehicle}; // placement new</code></pre>
           <li><code>-Os</code>: optimize for size.</li>
         </ul>
 
-        <h2>Design Principles Behind Polymorphism</h2>
+        <h2>Design Principle Anchor</h2>
         <ul>
-          <li>LSP (Liskov Substitution Principle): 
-            If S is a subtype of T, then objects of type T should be replaceable with objects of type S without breaking the program.
-            This is the Principle that supports the Polymorphic Substitutability in OOP.</li>
-        </li>
+          <li>LSP (Liskov Substitution Principle): If S is a subtype of T, then objects of type T should be replaceable with objects of type S without breaking the program.</li>
         </ul>
-        
-    
+
         <h2>Reference</h2>
         <p>
           Primary talk: <a href="https://www.youtube.com/watch?v=jBnIMEb2GhA" target="_blank" rel="noreferrer">Back to Basics: Virtual Dispatch and its Alternatives - Inbal Levi - CppCon 2019</a>
@@ -244,7 +268,7 @@ new (&amp;buffer_) Any{vehicle}; // placement new</code></pre>
         <h2>Closing Notes</h2>
         <p>
           Runtime dispatch is a practical engineering tool, not just a textbook OOP concept.
-          If you understand its mechanics (vtable, RTTI, erased wrappers, SBO), you can choose it intentionally and avoid both premature abstraction and premature optimization.
+          If you understand its mechanics (vtable, RTTI, erased wrappers, SBO, ABI tradeoffs, and devirtualization), you can choose it intentionally and avoid both premature abstraction and premature optimization.
         </p>
       </article>
 
